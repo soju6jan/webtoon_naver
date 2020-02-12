@@ -22,8 +22,8 @@
   {{ macros.m_col(2,  macros.m_strong('Created Time')) }}
   {{ macros.m_col(1,  macros.m_strong('ID')) }}
   {{ macros.m_col(2,  macros.m_strong('Status')) }}
-  {{ macros.m_col(3,  macros.m_strong('Title')) }}
-  {{ macros.m_col(3,  macros.m_strong('Action')) }}
+  {{ macros.m_col(4,  macros.m_strong('Title')) }}
+  {{ macros.m_col(2,  macros.m_strong('Action')) }}
   {{ macros.m_row_end() }}
   {{ macros.m_hr_head_bottom() }}
   <div id="list_div"></div>
@@ -63,14 +63,14 @@ function make_list(data) {
     str += m_col(1, data[i].title_id + '<br>' + data[i].episode_id)
     str += m_col(2, data[i].str_status + ' (' + data[i].download_count+ ')');
     if (data[i].title != null && data[i].title != 'None') 
-      str += m_col(3, data[i].title+ ' ' + data[i].episode_title);
+      str += m_col(4, data[i].title+ ' ' + data[i].episode_title);
     else
-      str += m_col(3, '--');
+      str += m_col(4, '--');
     tmp = m_button('remove_btn', '삭제', [{'key':'id', 'value':data[i].id}]);
     tmp += m_button('go_analyse_btn', '분석', [{'key':'id', 'value':data[i].title_id}]);
-    tmp += m_button('add_blacklist_btn', '제외 추가', [{'key':'id', 'value':data[i].id}]);
+    //tmp += m_button('add_blacklist_btn', '제외 추가', [{'key':'id', 'value':data[i].id}]);
     tmp = m_button_group(tmp)
-    str += m_col(3, tmp)
+    str += m_col(2, tmp)
     str += m_row_end();
     if (i != data.length -1) str += m_hr();
   }
