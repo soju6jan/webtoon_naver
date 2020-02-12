@@ -149,7 +149,7 @@ class LogicNormal(object):
         try:
             if LogicNormal.session is None:
                 LogicNormal.session = requests.session()
-            logger.debug('get_html :%s', url)
+            #logger.debug('get_html :%s', url)
             headers['Referer'] = '' if referer is None else referer
             page_content = LogicNormal.session.get(url, headers=headers)
             data = page_content.content
@@ -261,8 +261,10 @@ class LogicNormal(object):
                 img_tag = tag.find_elements_by_xpath('img')
                 if len(img_tag) > 1:
                     img_tag = img_tag[1]
-                elif len(img_tag) == 0:
+                elif len(img_tag) == 1:
                     img_tag = img_tag[0]
+                else:
+                    pass
                 left = img_tag.location['x']
                 top = tag.location['y']
                 right = img_tag.location['x'] + img_tag.size['width']
