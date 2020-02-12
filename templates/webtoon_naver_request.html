@@ -79,7 +79,7 @@ function make_program(data) {
     tmp += m_row_end();
     tmp += m_row_start(0);
     tmp += m_col(3, '설명', 'right');
-    tmp += m_col(9, data.desc);
+    tmp += m_col(9, data.desc + '<br>' + data.age);
     tmp += m_row_end();
     
     str += m_col(9, tmp)

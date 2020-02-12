@@ -71,7 +71,7 @@ class LogicNormal(object):
                         #logger.debug(flag)
                         if flag:
                             data = LogicNormal.analysis(title_id, '1')
-                            if data['ret'] == 'success':
+                            if data['ret'] == 'success' and data['is_adult'] == False:
                                 last_entity = ModelItem.get(title_id, data['episodes'][0]['no'])
                                 if last_entity is None:
                                     from .logic_queue import LogicQueue
@@ -108,29 +108,36 @@ class LogicNormal(object):
             ret['title'] = tree.xpath('%s/div[2]/h2/text()' % base_div)[0].strip()
             ret['author'] = tree.xpath('%s/div[2]/h2/span' % base_div)[0].text_content().strip()
             ret['desc'] = tree.xpath('%s/div[2]/p' % base_div)[0].text_content().strip()
+            ret['age'] = tree.xpath('%s/div[2]/p[2]/span[2]' % base_div)[0].text_content().strip()
+            ret['is_adult'] = False
+            if ret['age'].startswith('18'):
+                ret['is_adult'] = True
 
             tr = tree.xpath('//*[@id="content"]/table/tr')
             #logger.debug(len(tr))
             ret['episodes'] = []
-            for i in range(1, len(tr)):
-                try:
-                    #logger.debug(i)
-                    entity = {}
-                    td = tr[i].xpath('td[1]/a')[0]
-                    entity['href'] = td.attrib['href']
+            if not ret['is_adult']:
+                for i in range(1, len(tr)):
+                    try:
+                        #logger.debug(i)
+                        entity = {}
+                        td = tr[i].xpath('td[1]/a')[0]
+                        entity['href'] = td.attrib['href']
 
-                    td = tr[i].xpath('td[1]/a/img')[0]
-                    entity['image'] = td.attrib['src']
+                        td = tr[i].xpath('td[1]/a/img')[0]
+                        entity['image'] = td.attrib['src']
 
-                    entity['episode_title'] = tr[i].xpath('td[2]')[0].text_content().strip()
-                    entity['rating'] = tr[i].xpath('td[3]')[0].text_content().strip()
-                    entity['date'] = tr[i].xpath('td[4]')[0].text_content().strip()
-                    entity['no'] = entity['href'].split('no=')[1].split('&')[0]
-                    ret['episodes'].append(entity)
-                except:
-                    pass
+                        entity['episode_title'] = tr[i].xpath('td[2]')[0].text_content().strip()
+                        entity['rating'] = tr[i].xpath('td[3]')[0].text_content().strip()
+                        entity['date'] = tr[i].xpath('td[4]')[0].text_content().strip()
+                        entity['no'] = entity['href'].split('no=')[1].split('&')[0]
+                        ret['episodes'].append(entity)
+                    except:
+                        pass
 
-            ret['is_next'] = (data.find('<span class="cnt_page">다음</span>') != -1)
+                ret['is_next'] = (data.find('<span class="cnt_page">다음</span>') != -1)
+            else:
+                ret['is_next'] = False
             ret['page'] = page
             ret['code'] = code
             ret['ret'] = 'success'
@@ -215,6 +222,7 @@ class LogicNormal(object):
 
             driver = LogicNormal.driver
             url = 'https://comic.naver.com/webtoon/detail.nhn?titleId=%s&no=%s' % (entity['title_id'], entity['episode_id'])
+            logger.debug(url)
             ret = False
 
             driver.get(url)
