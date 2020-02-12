@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div>
+  {{ macros.m_button_group([['reset_queue_btn', '초기화'], ['completed_remove_btn', '완료된 항목 삭제']])}}
+  {{ macros.m_row_start('0') }}
+  {{ macros.m_row_end() }}
+
+  {{ macros.m_hr_head_top() }}
+  {{ macros.m_row_start('5') }}
+  {{ macros.m_col(1,  macros.m_strong('Type')) }}
+  {{ macros.m_col(6,  macros.m_strong('Title')) }}
+  {{ macros.m_col(2,  macros.m_strong('ID')) }}
+  {{ macros.m_col(1,  macros.m_strong('Count')) }}
+  {{ macros.m_col(1,  macros.m_strong('Status')) }}
+  {{ macros.m_row_end() }}
+  {{ macros.m_hr_head_bottom() }}
+  <div id="queue_list_div"></div>
+</div> <!--전체-->
+
+
+<script type="text/javascript">
+var package_name = "{{arg['package_name'] }}";
+var current_data = null;
+
+$(document).ready(function(){
+  var protocol = window.location.protocol;
+  socket = io.connect(protocol + "//" + document.domain + ":" + location.port + "/" + package_name);
+
+  socket.on('queue_list', function(data){
+    on_queue_list(data);
+  });
+
+  socket.on('queue_one', function(data){
+    console.log(data)
+    str = make_queue_one(data)
+    document.getElementById("queue_"+data.id+'_div').innerHTML = str;
+  });
+
+});
+
+function on_queue_list(data) {
+  current_data = data
+  make_queue_list(data)
+}
+
+function make_queue_list(data) {
+  str = '';
+  for (i in data) {
+    str += '<div id="queue_'+data[i].id+'_div">'
+    str += make_queue_one(data[i])
+    str += '</div>' //one
+    if (i != data.length -1) str += m_hr(0);
+  }
+  document.getElementById("queue_list_div").innerHTML = str;
+}
+
+function make_queue_one(data) {
+  console.log(data)
+  str = m_row_start();
+  str += m_col(1, data.id)
+  str += m_col(2, data.created_time)
+  str += m_col(1, data.title_id)
+  str += m_col(1, data.episode_id)
+  
+  str += m_col(2, data.str_status)
+  tmp = ''
+  if (data.title != null && data.title != 'None') {
+    tmp = data.title
+    tmp += ' - '+ data.episode_title
+  }
+  str += m_col(5, tmp)
+  /*
+  tmp = ''
+  if (data.filename != null) {
+    tmp = data.filename
+  }
+  str += m_col(4, tmp)
+  */
+  str += m_row_end();
+  return str
+}
+
+$("body").on('click', '#completed_remove_btn', function(e){
+  e.preventDefault();
+  $.ajax({
+    url: '/' + package_name + '/ajax/completed_remove',
+    type: "POST",
+    cache: false,
+    data: {},
+    dataType: "json",
+    success: function (ret) {}
+  });
+});
+
+$("body").on('click', '#reset_queue_btn', function(e){
+  e.preventDefault();
+  $.ajax({
+    url: '/' + package_name + '/ajax/reset_queue',
+    type: "POST",
+    cache: false,
+    data: {},
+    dataType: "json",
+    success: function (ret) {
+    }
+  });
+});
+
+</script>
+{% endblock %}

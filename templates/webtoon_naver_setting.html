@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div>
+  {{ macros.m_button_group([['global_setting_save_btn', '설정 저장']])}}
+  {{ macros.m_row_start('5') }}
+  {{ macros.m_row_end() }}
+  <nav>  
+    {{ macros.m_tab_head_start() }}
+      {{ macros.m_tab_head2('normal', '일반', true) }}
+      {{ macros.m_tab_head2('auto', '자동', false) }}
+      {{ macros.m_tab_head2('etc', '기타', false) }}
+    {{ macros.m_tab_head_end() }}
+  </nav>
+  <form id='setting' name='setting'>
+  <div class="tab-content" id="nav-tabContent">
+    {{ macros.m_tab_content_start('normal', true) }}
+      {{ macros.setting_input_text('download_path', '다운로드 경로', value=arg['download_path'], desc=['다운로드 경로입니다.']) }}
+      {{ macros.setting_checkbox('use_title_folder', '제목별 폴더', value=arg['use_title_folder'], desc=['On : 제목별로 폴더를 생성하여 저장', 'Off : 다운로드 경로 루트에 저장']) }}
+    {{ macros.m_tab_content_end() }}
+    {{ macros.m_tab_content_start('auto', false) }}
+      {{ macros.setting_global_scheduler_button(arg['scheduler'], arg['is_running']) }}
+      {{ macros.setting_input_int('interval', '스케쥴링 실행 주기', value=arg['interval'], min='1', placeholder='10', desc='minute 단위') }}
+      {{ macros.setting_checkbox('auto_start', '시작시 자동실행', value=arg['auto_start'], desc='On : 시작시 자동으로 스케쥴러에 등록됩니다.') }}
+      {{ macros.setting_input_textarea('whitelist', '자동 다운로드 할 만화 이름', value=arg['whitelist'], row='5', desc=['구분자 |', '빈칸인 경우 모두 다운로드합니다.']) }}
+      {{ macros.setting_input_textarea('blacklist', '다운로드 제외 만화 이름', value=arg['blacklist'], row='3', desc=['구분자 |']) }}
+    {{ macros.m_tab_content_end() }}
+    
+    {{ macros.m_tab_content_start('etc', false) }}
+      {{ macros.setting_button([['global_one_execute_btn', '1회 실행']], left='1회 실행' ) }}
+      {{ macros.setting_button([['global_reset_db_btn', '목록 초기화']], left='DB정리' ) }}
+    {{ macros.m_tab_content_end() }}
+  </div><!--tab-content-->
+</form>
+</div><!--전체-->
+
+<script type="text/javascript">
+var package_name = "{{arg['package_name'] }}";
+var current_data = null;
+
+$(document).ready(function(){
+});
+
+</script>    
+{% endblock %}

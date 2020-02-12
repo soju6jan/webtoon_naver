@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div>
+  <form id='program_list'>
+    {{ macros.setting_input_text_and_buttons('code', '작품 Code', [['analysis_btn', '분석'], ['go_btn', 'Go 웹툰']], desc='titleid') }}
+  </form>
+  <form id="program_auto_form">
+  <div id='detail1'></div>
+  <div id="more"></div>
+  <form>
+</div>
+
+<script type="text/javascript">
+var package_name = "{{arg['package_name'] }}";
+
+var current_data = null;
+var episode_auto = false;
+
+$(document).ready(function(){
+  //$('input[name=login_type]')[0].checked = true;
+  if ( "{{arg['recent_title_id']}}" != "None" && "{{arg['recent_title_id']}}" != "" ) {
+    document.getElementById("code").value = "{{arg['recent_title_id']}}";
+    document.getElementById("analysis_btn").click();
+  }
+});
+
+
+$("body").on('click', '#analysis_btn', function(e){
+  e.preventDefault();
+  code = document.getElementById("code").value
+  episode_auto = false
+  $.ajax({
+    url: '/' + package_name + '/ajax/analysis',
+    type: "POST",
+    cache: false,
+    data: {code:code, page:'1'},
+    dataType: "json",
+    success: function (data) {
+      if (data.ret == 'success') {
+        make_program(data)
+      } else {
+        $.notify('<strong>분석 실패</strong><br>' + data.log, {
+          type: 'warning'
+        });
+      }
+    }
+  });
+});
+
+
+$("body").on('click', '#go_btn', function(e){
+  e.preventDefault();
+  window.open("https://comic.naver.com/webtoon/weekday.nhn", "_blank");
+});
+
+
+function make_program(data) {
+  current_data = data
+  str = '';
+  if (data.page == '1') {
+    tmp = m_button('check_download_btn', '선택 다운로드 추가', []);
+    tmp += m_button('all_check_on_btn', '전체 선택', []);
+    tmp += m_button('all_check_off_btn', '전체 해제', []);
+    tmp += m_button('all_episode_btn', '전체 에피소드 정보 받기', []);
+    tmp = m_button_group(tmp)
+    str += tmp
+    // program
+    str += m_hr_black();
+    str += m_row_start(0);
+    tmp = ''
+    if (data.image != null) 
+      tmp = '<img src="' + data.image + '" class="img-fluid">';
+    str += m_col(3, tmp)
+    tmp = ''
+    tmp += m_row_start(0);
+    tmp += m_col(3, '제목/작가', 'right');
+    tmp += m_col(9, data.title + ' / ' + data.author);
+    tmp += m_row_end();
+    tmp += m_row_start(0);
+    tmp += m_col(3, '설명', 'right');
+    tmp += m_col(9, data.desc);
+    tmp += m_row_end();
+    
+    str += m_col(9, tmp)
+    str += m_row_end();
+    str += m_hr_black();
+  }
+  
+  for (i in data.episodes) {
+    if (data.page != '1') str += m_hr(0);
+    str += m_row_start(0);
+    str += m_col(1, data.episodes[i].no)
+
+    tmp = '<div class="form-inline">'
+    tmp += '<input id="checkbox_'+data.episodes[i].no+'" name="checkbox_'+data.episodes[i].no+'" type="checkbox" checked data-toggle="toggle" data-on="선 택" data-off="-" data-onstyle="success" data-offstyle="danger" data-size="small">&nbsp;&nbsp;&nbsp;&nbsp;'
+    tmp += m_button('add_queue_btn', '다운로드 추가', [{'key':'no', 'value':data.episodes[i].no}])
+    tmp += '</div>'
+    
+    //str += m_col(2, '<img src="' + data.episodes[i].image + '" class="img-fluid">')
+    
+    str += m_col(6, '<strong>' + data.episodes[i].episode_title+ '</strong>')
+    str += m_col(1, data.episodes[i].rating)
+    str += m_col(1, data.episodes[i].date)
+    str += m_col(3, tmp, 'right')
+    //str += m_col(9, tmp)
+    str += m_row_end();
+    if (i != data.episodes.length -1) str += m_hr(0);
+  }
+  str += "<div id='detail"+(parseInt(data.page)+1)+"'></div>"
+  document.getElementById("detail"+parseInt(data.page)).innerHTML = str;
+
+  //document.getElementById("episode_list").innerHTML = str;
+
+  if (data.is_next) {
+    str = '<div class="d-inline-block"></div><form>';
+    str += '<button id="more_btn" class="btn btn-outline-secondary btn-lg btn-block" type="button" data-code="'+data.code+'" data-page="'+data.page+'">More</button>'
+    str += '</form>';
+    document.getElementById("more").innerHTML = str;
+  } else {
+    document.getElementById("more").innerHTML = '';
+  }
+
+  $('input[id^="checkbox_"]').bootstrapToggle()
+}
+
+
+$("body").on('click', '#more_btn', function(e){
+  e.preventDefault();
+  code = $(this).data('code');
+  page = parseInt($(this).data('page')) + 1;
+  $.ajax({
+    url: '/' + package_name + '/ajax/analysis',
+    type: "POST", 
+    cache: false,
+    data: {code:code, page:page},
+    dataType: "json",
+    success: function (data) {
+      make_program(data);
+      if (episode_auto) {
+        if (data.is_next) {
+          document.getElementById("more_btn").click();  
+        } else {
+          episode_auto = false;
+        }
+      }
+    }
+  });
+});
+
+$("body").on('click', '#check_download_btn', function(e){
+  e.preventDefault();
+  all = $('input[id^="checkbox_"]')
+  str = ""
+  for (i in all) {
+    if (all[i].checked){
+      no = all[i].id.split('_')[1]
+      str += no+","
+    }
+  }
+  if (str == "") {
+    $.notify('<strong>선택하세요.</strong>', {
+      type: 'warning'
+    });
+    return
+  }
+
+  $.ajax({
+    url: '/' + package_name + '/ajax/add_queue_check',
+    type: "POST", 
+    cache: false,
+    data: {code:current_data.code, no_list:str},
+    dataType: "json",
+    success: function (data) {
+      if (data.ret == 'success') {
+        $.notify('<strong>'+data.log+'개를 추가하였습니다.</strong>', {
+          type: 'success'
+        });
+      } else {
+        $.notify('<strong>'+data.log+'</strong>', {
+          type: 'warning'
+        });
+      }
+    }
+  });
+});
+
+
+$("body").on('click', '#all_check_on_btn', function(e){
+  e.preventDefault();
+  $('input[id^="checkbox_"]').bootstrapToggle('on')
+});
+
+$("body").on('click', '#all_check_off_btn', function(e){
+  e.preventDefault();
+  $('input[id^="checkbox_"]').bootstrapToggle('off')
+});
+
+$("body").on('click', '#all_episode_btn', function(e){
+  e.preventDefault();
+  episode_auto = true
+  document.getElementById("more_btn").click();  
+});
+
+
+$("body").on('click', '#add_queue_btn', function(e){
+  e.preventDefault();
+  code = current_data.code
+  no = $(this).data('no');
+  $.ajax({
+    url: '/' + package_name + '/ajax/add_queue',
+    type: "POST", 
+    cache: false,
+    data: {code:code, no:no},
+    dataType: "json",
+    success: function (data) {
+      if (data == 'success') {
+        $.notify('<strong>큐에 추가 하였습니다.</strong>', {
+          type: 'success'
+        });
+      } else {
+        $.notify('<strong>실패하였습니다.</strong>', {
+          type: 'warning'
+        });
+      }
+    }
+  });
+});
+
+</script>
+{% endblock %}
