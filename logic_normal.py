@@ -108,11 +108,15 @@ class LogicNormal(object):
             ret['title'] = tree.xpath('%s/div[2]/h2/text()' % base_div)[0].strip()
             ret['author'] = tree.xpath('%s/div[2]/h2/span' % base_div)[0].text_content().strip()
             ret['desc'] = tree.xpath('%s/div[2]/p' % base_div)[0].text_content().strip()
-            ret['age'] = tree.xpath('%s/div[2]/p[2]/span[2]' % base_div)[0].text_content().strip()
+            # 날짜 없을수도
+            try:
+                ret['age'] = tree.xpath('%s/div[2]/p[2]/span[2]' % base_div)[0].text_content().strip()
+            except:
+                ret['age'] = ''
             ret['is_adult'] = False
             if ret['age'].startswith('18'):
                 ret['is_adult'] = True
-
+                
             tr = tree.xpath('//*[@id="content"]/table/tr')
             #logger.debug(len(tr))
             ret['episodes'] = []
