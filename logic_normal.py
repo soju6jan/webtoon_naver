@@ -168,8 +168,9 @@ class LogicNormal(object):
     @staticmethod
     def download(entity):
         try:
-            #if app.config['config']['use_celery']:
-            if False:
+            LogicNormal.download2(entity)
+            return
+            if app.config['config']['use_celery']:
                 result = LogicNormal.download2.apply_async((entity,))
                 #result.get()
                 try:
@@ -181,7 +182,7 @@ class LogicNormal(object):
                     except:
                         pass
             else:
-                LogicNormal.download2(entity)
+                LogicNormal.download2(None, entity)
         except Exception as e:
             logger.error('Exception:%s', e)
             logger.error(traceback.format_exc())
@@ -205,6 +206,8 @@ class LogicNormal(object):
     
     @staticmethod
     def update_ui(celery_is, entity):
+        LogicNormal.entity_update(entity)
+        return
         if app.config['config']['use_celery']:
             
             celery_is.update_state(state='PROGRESS', meta={'data':entity})
