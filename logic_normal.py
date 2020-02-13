@@ -168,7 +168,8 @@ class LogicNormal(object):
     @staticmethod
     def download(entity):
         try:
-            if app.config['config']['use_celery']:
+            #if app.config['config']['use_celery']:
+            if False:
                 result = LogicNormal.download2.apply_async((entity,))
                 #result.get()
                 try:
@@ -266,31 +267,34 @@ class LogicNormal(object):
                 entity['str_status'] = '다운로드중'
                 LogicNormal.update_ui(self, entity)
                 full = LogicSelenium.full_screenshot(driver)
-                img_tag = tag.find_elements_by_xpath('img')
-                if len(img_tag) > 1:
-                    img_tag = img_tag[1]
-                elif len(img_tag) == 1:
-                    img_tag = img_tag[0]
-                else:
-                    pass
-                left = img_tag.location['x']
-                top = tag.location['y']
-                right = img_tag.location['x'] + img_tag.size['width']
-                bottom = tag.location['y'] + tag.size['height']
+                if full is not None:
+                    img_tag = tag.find_elements_by_xpath('img')
+                    if len(img_tag) > 1:
+                        img_tag = img_tag[1]
+                    elif len(img_tag) == 1:
+                        img_tag = img_tag[0]
+                    else:
+                        img_tag = tag
+                    left = img_tag.location['x']
+                    top = tag.location['y']
+                    right = img_tag.location['x'] + img_tag.size['width']
+                    bottom = tag.location['y'] + tag.size['height']
 
-                
-                im = full.crop((left, top, right, bottom)) # defines crop points
-                im.save(entity['filename'])
-                entity['status'] = 11
-                entity['str_status'] = '완료'
-                LogicNormal.update_ui(self, entity)
+                    
+                    im = full.crop((left, top, right, bottom)) # defines crop points
+                    im.save(entity['filename'])
+                    entity['status'] = 11
+                    entity['str_status'] = '완료'
+                    LogicNormal.update_ui(self, entity)
+                else:
+                    raise Exception('capture fail.')
             
         except Exception as e:
             logger.error('Exception:%s', e)
             logger.error(traceback.format_exc())
             entity['status'] = 2
             entity['str_status'] = '실패'
-            if entity['download_count'] >= 20:
+            if entity['download_count'] >= 5:
                 entity['status'] = 13
                 entity['str_status'] = '재시도초과'
             LogicNormal.update_ui(self, entity)
