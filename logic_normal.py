@@ -121,7 +121,7 @@ class LogicNormal(object):
             #logger.debug(len(tr))
             ret['episodes'] = []
             if not ret['is_adult']:
-                for i in range(1, len(tr)):
+                for i in range(0, len(tr)):
                     try:
                         #logger.debug(i)
                         entity = {}
