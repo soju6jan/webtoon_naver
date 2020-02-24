@@ -223,10 +223,10 @@ class LogicNormal(object):
     @celery.task(bind=True)
     def download2(self, entity):
         try:
-            from system import LogicSelenium
+            from system import SystemLogicSelenium
             import plugin
             if LogicNormal.driver is None:
-                LogicNormal.driver = LogicSelenium.create_driver()
+                LogicNormal.driver = SystemLogicSelenium.create_driver()
 
             driver = LogicNormal.driver
             url = 'https://comic.naver.com/webtoon/detail.nhn?titleId=%s&no=%s' % (entity['title_id'], entity['episode_id'])
@@ -240,7 +240,7 @@ class LogicNormal(object):
             LogicNormal.update_ui(self, entity)
 
             tag = WebDriverWait(driver, 30).until(lambda driver: driver.find_element_by_xpath('//*[@id="content"]/div[1]/div[1]/div[2]/h2'))
-            entity['title'] = LogicSelenium.get_text_excluding_children(driver, tag).strip()
+            entity['title'] = SystemLogicSelenium.get_text_excluding_children(driver, tag).strip()
 
             tag = WebDriverWait(driver, 30).until(lambda driver: driver.find_element_by_xpath('//*[@id="content"]/div[1]/div[2]/div[1]/h3'))
             entity['episode_title'] = tag.text
@@ -273,7 +273,7 @@ class LogicNormal(object):
             else:
                 entity['str_status'] = '다운로드중'
                 LogicNormal.update_ui(self, entity)
-                full = LogicSelenium.full_screenshot(driver)
+                full = SystemLogicSelenium.full_screenshot(driver)
                 if full is not None:
                     img_tag = tag.find_elements_by_xpath('img')
                     if len(img_tag) > 1:
