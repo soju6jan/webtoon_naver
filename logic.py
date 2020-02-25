@@ -30,6 +30,7 @@ class Logic(object):
         #"all_download" : "False", 
         "whitelist" : "",
         "blacklist" : "",
+        "use_selenium" : "False",
     }
 
     @staticmethod

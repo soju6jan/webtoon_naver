@@ -172,7 +172,10 @@ class LogicNormal(object):
     @staticmethod
     def download(entity):
         try:
-            LogicNormal.download2(entity)
+            if ModelSetting.get_bool('use_selenium'):
+                LogicNormal.download2(entity)
+            else:
+                LogicNormal.download_normal(entity)
             return
             if app.config['config']['use_celery']:
                 result = LogicNormal.download2.apply_async((entity,))
@@ -273,7 +276,7 @@ class LogicNormal(object):
             else:
                 entity['str_status'] = '다운로드중'
                 LogicNormal.update_ui(self, entity)
-                full = SystemLogicSelenium.full_screenshot(driver)
+                full = LogicNormal.full_screenshot(driver)
                 if full is not None:
                     img_tag = tag.find_elements_by_xpath('img')
                     if len(img_tag) > 1:
@@ -308,7 +311,100 @@ class LogicNormal(object):
         
         ModelItem.save_as_dict(entity)
         
-            
 
+
+    @staticmethod
+    def download_normal(entity):
+        try:
+            
+            url = 'https://comic.naver.com/webtoon/detail.nhn?titleId=%s&no=%s' % (entity['title_id'], entity['episode_id'])
+            data = LogicNormal.get_html(url)
+            tree = html.fromstring(data)
+
+            entity['download_count'] += 1
+            entity['status'] = 1
+            entity['str_status'] = '대기'
+            LogicNormal.entity_update(entity)
+
+            entity['title'] = tree.xpath('//*[@id="content"]/div[1]/div[1]/div[2]/h2/text()')[0].strip()
+            logger.debug(entity['title'])
+            tag = tree.xpath('//*[@id="content"]/div[1]/div[2]/div[1]/h3')[0]
+            entity['episode_title'] = tag.text_content().strip()
+            logger.debug(entity['episode_title'])
+            entity['str_status'] = '분석'
+            LogicNormal.entity_update(entity)
+
+            logger.debug(entity)
+
+
+            tags = tree.xpath('//*[@id="comic_view_area"]/div[1]/img')
+            dirname = ModelSetting.get('download_path')
+            if ModelSetting.get_bool('use_title_folder'):
+                dirname = os.path.join(dirname, Util.change_text_for_use_filename(entity['title']))
+            if not os.path.exists(dirname):
+                os.makedirs(dirname)
+            tmp = u'%s %s' % (entity['title'], entity['episode_title'])
+            dirname = os.path.join(dirname, Util.change_text_for_use_filename(tmp))
+            if not os.path.exists(dirname):
+                os.makedirs(dirname)
+            entity['filename'] = '%s.zip' % tmp
+
+            if os.path.exists(entity['filename']):
+                entity['status'] = 12
+                entity['str_status'] = '파일 있음'
+                LogicNormal.entity_update(entity)
+            else:    
+                entity['str_status'] = '다운로드중'
+                LogicNormal.entity_update(entity)
+
+                for idx, img in enumerate(tags):
+                    src = img.attrib['src']
+
+                    filename = os.path.join(dirname, str(idx+1).zfill(2) + '.jpg')
+
+                    image_data = requests.get(src, headers=headers, stream=True)
+                    with open(filename, 'wb') as handler:
+                        handler.write(image_data.content)
+                    
+                    entity['str_status'] = '다운로드중 %s / %s' % (idx+1, len(tags))
+                    LogicNormal.entity_update(entity)
+                
+                LogicNormal.makezip(dirname)
+
+                entity['status'] = 11
+                entity['str_status'] = '완료'
+                LogicNormal.entity_update(entity)
+
+            
+        except Exception as e:
+            logger.error('Exception:%s', e)
+            logger.error(traceback.format_exc())
+            entity['status'] = 2
+            entity['str_status'] = '실패'
+            if entity['download_count'] >= 5:
+                entity['status'] = 13
+                entity['str_status'] = '재시도초과'
+            LogicNormal.entity_update(entity)
+        
+        ModelItem.save_as_dict(entity)                
+
+    # 압축할 폴더 경로를 인자로 받음. 폴더명.zip 생성
+    @staticmethod
+    def makezip(zip_path):
+        import zipfile
+        try:
+            if os.path.isdir(zip_path):
+                zipfilename = os.path.join(os.path.dirname(zip_path), '%s.zip' % os.path.basename(zip_path))
+                fantasy_zip = zipfile.ZipFile(zipfilename, 'w')
+                for f in os.listdir(zip_path):
+                    if f.endswith('.jpg') or f.endswith('.png'):
+                        src = os.path.join(zip_path, f)
+                        fantasy_zip.write(src, os.path.basename(src), compress_type = zipfile.ZIP_DEFLATED)
+                fantasy_zip.close()
+            import shutil
+            shutil.rmtree(zip_path)
+        except Exception as e:
+            logger.error('Exception:%s', e)
+            logger.error(traceback.format_exc())
 
     
