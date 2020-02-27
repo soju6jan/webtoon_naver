@@ -276,7 +276,8 @@ class LogicNormal(object):
             else:
                 entity['str_status'] = '다운로드중'
                 LogicNormal.update_ui(self, entity)
-                full = LogicNormal.full_screenshot(driver)
+                from system import SystemLogicSelenium
+                full = SystemLogicSelenium.full_screenshot(driver)
                 if full is not None:
                     img_tag = tag.find_elements_by_xpath('img')
                     if len(img_tag) > 1:
