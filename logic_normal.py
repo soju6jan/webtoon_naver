@@ -267,7 +267,7 @@ class LogicNormal(object):
                 dirname = os.path.join(dirname, Util.change_text_for_use_filename(entity['title']))
             if not os.path.exists(dirname):
                 os.makedirs(dirname)
-            tmp = u'%s %s.png' % (entity['title'], entity['episode_title'])
+            tmp = u'%s %s %s.png' % (entity['episode_id'].zfill(3), entity['title'], entity['episode_title'])
             entity['filename'] = os.path.join(dirname, Util.change_text_for_use_filename(tmp))
             if os.path.exists(entity['filename']):
                 entity['status'] = 12
@@ -344,7 +344,7 @@ class LogicNormal(object):
                 dirname = os.path.join(dirname, Util.change_text_for_use_filename(entity['title']))
             if not os.path.exists(dirname):
                 os.makedirs(dirname)
-            tmp = u'%s %s' % (entity['title'], entity['episode_title'])
+            tmp = u'%s %s %s' % (entity['episode_id'].zfill(3), entity['title'], entity['episode_title'])
             dirname = os.path.join(dirname, Util.change_text_for_use_filename(tmp))
             if not os.path.exists(dirname):
                 os.makedirs(dirname)
