@@ -44,11 +44,11 @@ menu = {
 
 plugin_info = {
     'version' : '0.1.0.0',
-    'name' : 'naver_webtoon',
+    'name' : 'webtoon_naver',
     'category_name' : 'service',
     'developer' : 'soju6jan',
     'description' : '네이버 웹툰 다운로드',
-    'home' : 'https://github.com/soju6jan/naver_webtoon',
+    'home' : 'https://github.com/soju6jan/webtoon_naver',
     'more' : '',
 }
 
