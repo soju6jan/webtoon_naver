@@ -335,8 +335,7 @@ class LogicNormal(object):
             entity['str_status'] = '분석'
             LogicNormal.entity_update(entity)
 
-            logger.debug(entity)
-
+            #logger.debug(entity)
 
             tags = tree.xpath('//*[@id="comic_view_area"]/div[1]/img')
             dirname = ModelSetting.get('download_path')
@@ -345,6 +344,8 @@ class LogicNormal(object):
             if not os.path.exists(dirname):
                 os.makedirs(dirname)
             tmp = u'%s %s %s' % (entity['episode_id'].zfill(3), entity['title'], entity['episode_title'])
+            if len(tmp) > 200:
+                tmp = u'%s %s' % (entity['episode_id'].zfill(3), entity['title'])
             dirname = os.path.join(dirname, Util.change_text_for_use_filename(tmp))
             if not os.path.exists(dirname):
                 os.makedirs(dirname)
