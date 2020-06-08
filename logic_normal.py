@@ -54,7 +54,8 @@ class LogicNormal(object):
             data = LogicNormal.get_html(url)
             tree = html.fromstring(data)
             tags = tree.xpath('//div[@class="thumb"]')
-            logger.debug(whitelists)
+            #logger.debug(whitelists)
+            #logger.debug(whitelists[0])
             for tag in tags:
                 href = tag.xpath('a')[0].attrib['href']
                 em = tag.xpath('a/em')
@@ -63,19 +64,30 @@ class LogicNormal(object):
                         title = tag.xpath('following-sibling::a')[0].attrib['title'].strip()
                         title_id = href.split('titleId=')[1].split('&')[0].strip()
                         flag = False
+                        #logger.debug(title.replace(' ', ''))
                         if len(whitelists) == 0 or title.replace(' ', '') in whitelists:
                             flag = True
                         if flag and len(blacklists) > 0 and title.replace(' ', '') in blacklists:
                             flag = False
-                        #logger.debug(title)
-                        #logger.debug(flag)
                         if flag:
+                            from .logic_queue import LogicQueue
                             data = LogicNormal.analysis(title_id, '1')
                             if data['ret'] == 'success' and data['is_adult'] == False:
-                                last_entity = ModelItem.get(title_id, data['episodes'][0]['no'])
-                                if last_entity is None:
-                                    from .logic_queue import LogicQueue
-                                    LogicQueue.add_queue(title_id, data['episodes'][0]['no'])
+                                if ModelSetting.get_bool('all_episode_download'):
+                                    page = 1
+                                    while True:
+                                        for episode in data['episodes']:
+                                            entity = ModelItem.get(title_id, episode['no'])
+                                            if entity is None:
+                                                LogicQueue.add_queue(title_id, episode['no'])
+                                        if data['is_next'] == False:
+                                            break
+                                        page += 1
+                                        data = LogicNormal.analysis(title_id, str(page))
+                                else:
+                                    last_entity = ModelItem.get(title_id, data['episodes'][0]['no'])
+                                    if last_entity is None:
+                                        LogicQueue.add_queue(title_id, data['episodes'][0]['no'])
                                     
         except Exception as e: 
             logger.error('Exception:%s', e)

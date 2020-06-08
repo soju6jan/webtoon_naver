@@ -31,6 +31,7 @@ class Logic(object):
         "whitelist" : "",
         "blacklist" : "",
         "use_selenium" : "False",
+        'all_episode_download' : 'False',
     }
 
     @staticmethod
