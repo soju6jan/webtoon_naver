@@ -21,7 +21,7 @@
     {{ macros.m_tab_content_end() }}
     {{ macros.m_tab_content_start('auto', false) }}
       {{ macros.setting_global_scheduler_button(arg['scheduler'], arg['is_running']) }}
-      {{ macros.setting_input_int('interval', '스케쥴링 실행 주기', value=arg['interval'], min='1', placeholder='10', desc='minute 단위') }}
+      {{ macros.setting_input_text('interval', '스케쥴링 실행 정보', value=arg['interval'], col='3', placeholder='10', desc=['Inverval(minute 단위)이나 Cron 설정']) }}
       {{ macros.setting_checkbox('auto_start', '시작시 자동실행', value=arg['auto_start'], desc='On : 시작시 자동으로 스케쥴러에 등록됩니다.') }}
       {{ macros.setting_checkbox('all_episode_download', '이전 회차 모두 다운로드', value=arg['all_episode_download'], desc=['On : 이전 회차 모두 다운합니다.', 'DB 에 다운이력이 있는 경우는 받지 않습니다.']) }}
       {{ macros.setting_input_textarea('whitelist', '자동 다운로드 할 만화 이름', value=arg['whitelist'], row='5', desc=['구분자 |', '빈칸인 경우 모두 다운로드합니다.']) }}
