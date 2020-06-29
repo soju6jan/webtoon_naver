@@ -54,7 +54,7 @@ class Logic(object):
             Logic.db_init()
             if ModelSetting.get_bool('auto_start'):
                 Logic.scheduler_start()
-            Logic.scheduler_start2()
+            #Logic.scheduler_start2()
             # 편의를 위해 json 파일 생성
             from plugin import plugin_info
             Util.save_from_dict_to_json(plugin_info, os.path.join(os.path.dirname(__file__), 'info.json'))
@@ -76,6 +76,8 @@ class Logic(object):
             logger.debug('%s scheduler_start' % package_name)
             job = Job(package_name, package_name, ModelSetting.get('interval'), Logic.scheduler_function, u"네이버 웹툰 새로운 에피소드 체크", False)
             scheduler.add_job_instance(job)
+
+            Logic.scheduler_start2()
         except Exception as e: 
             logger.error('Exception:%s', e)
             logger.error(traceback.format_exc())
@@ -96,6 +98,7 @@ class Logic(object):
         try:
             logger.debug('%s scheduler_stop' % package_name)
             scheduler.remove_job(package_name)
+            scheduler.remove_job('%s_check' % package_name)
         except Exception as e: 
             logger.error('Exception:%s', e)
             logger.error(traceback.format_exc())
