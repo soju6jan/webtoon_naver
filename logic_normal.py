@@ -184,10 +184,13 @@ class LogicNormal(object):
     @staticmethod
     def download(entity):
         try:
+            """
             if ModelSetting.get_bool('use_selenium'):
                 LogicNormal.download2(entity)
             else:
                 LogicNormal.download_normal(entity)
+            """
+            LogicNormal.download_normal(entity)
             return
             if app.config['config']['use_celery']:
                 result = LogicNormal.download2.apply_async((entity,))

@@ -15,7 +15,7 @@
   <form id='setting' name='setting'>
   <div class="tab-content" id="nav-tabContent">
     {{ macros.m_tab_content_start('normal', true) }}
-      {{ macros.setting_checkbox('use_selenium', 'Selenium 사용', value=arg['use_selenium'], desc=['On : Selenium 사용. 높은 자원 필요. 하나의 이미지 파일 생성', 'Off : 일반 크롤링. 여러 이미지 파일을 압축한 zip 생성']) }}
+      <!--{{ macros.setting_checkbox('use_selenium', 'Selenium 사용', value=arg['use_selenium'], desc=['On : Selenium 사용. 높은 자원 필요. 하나의 이미지 파일 생성', 'Off : 일반 크롤링. 여러 이미지 파일을 압축한 zip 생성']) }}-->
       {{ macros.setting_input_text('download_path', '다운로드 경로', value=arg['download_path'], desc=['다운로드 경로입니다.']) }}
       {{ macros.setting_checkbox('use_title_folder', '제목별 폴더', value=arg['use_title_folder'], desc=['On : 제목별로 폴더를 생성하여 저장', 'Off : 다운로드 경로 루트에 저장']) }}
     {{ macros.m_tab_content_end() }}
