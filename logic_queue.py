@@ -6,12 +6,11 @@ import sys
 import traceback
 import logging
 import threading
-import Queue
 import json
 # third-party
 
 # sjva 공용
-from framework import db, scheduler, path_data
+from framework import db, scheduler, path_data, py_queue
 from framework.job import Job
 from framework.util import Util
 
@@ -34,7 +33,7 @@ class LogicQueue(object):
     def queue_start():
         try:
             if LogicQueue.download_queue is None:
-                LogicQueue.download_queue = Queue.Queue()
+                LogicQueue.download_queue = py_queue.Queue()
             
             if LogicQueue.download_thread is None:
                 LogicQueue.download_thread = threading.Thread(target=LogicQueue.download_thread_function, args=())
