@@ -11,7 +11,7 @@ from sqlalchemy import or_, and_, func, not_, desc
 from sqlalchemy.orm import backref
 
 # sjva 공용
-from framework import app, db, path_app_root
+from framework import app, db, path_app_root, py_unicode
 from framework.util import Util
 
 # 패키지
@@ -169,11 +169,11 @@ class ModelItem(db.Model):
             entity = db.session.query(ModelItem).filter_by(id=d['id']).with_for_update().first()
             if entity is not None:
                 entity.status = d['status']
-                entity.str_status = unicode(d['str_status'])
+                entity.str_status = py_unicode(d['str_status'])
                 entity.title_id = d['title_id']
                 entity.episode_id = d['episode_id']
-                entity.title = unicode(d['title'])
-                entity.episode_title = unicode(d['episode_title'])
+                entity.title = py_unicode(d['title'])
+                entity.episode_title = py_unicode(d['episode_title'])
                 entity.download_count = d['download_count']
                 entity.filename = d['filename']
 
