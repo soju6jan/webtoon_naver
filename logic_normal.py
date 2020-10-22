@@ -175,7 +175,7 @@ class LogicNormal(object):
             #logger.debug('get_html :%s', url)
             headers['Referer'] = '' if referer is None else referer
             page_content = LogicNormal.session.get(url, headers=headers)
-            data = page_content.content
+            data = page_content.text
         except Exception as e:
             logger.error('Exception:%s', e)
             logger.error(traceback.format_exc())
