@@ -223,7 +223,7 @@ class LogicNormal(object):
 
     @staticmethod
     def entity_update(entity):
-        import plugin
+        from . import plugin
         plugin.socketio_callback('queue_one', entity, encoding=False)
     
     @staticmethod
@@ -242,7 +242,7 @@ class LogicNormal(object):
     def download2(self, entity):
         try:
             from system import SystemLogicSelenium
-            import plugin
+            from . import plugin
             if LogicNormal.driver is None:
                 LogicNormal.driver = SystemLogicSelenium.create_driver()
 

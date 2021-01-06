@@ -84,7 +84,7 @@ class LogicQueue(object):
                 if e['status'] <= 10:
                     new_list.append(e)
             LogicQueue.entity_list = new_list
-            import plugin
+            from . import plugin
             plugin.send_queue_list()
         except Exception as e:
             logger.error('Exception:%s', e)
@@ -97,7 +97,7 @@ class LogicQueue(object):
             with LogicQueue.download_queue.mutex:
                 LogicQueue.download_queue.queue.clear()
             LogicQueue.entity_list = []
-            import plugin
+            from . import plugin
             plugin.send_queue_list()
             #LogicMD.stop()
         except Exception as e:
