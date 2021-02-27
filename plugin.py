@@ -14,7 +14,6 @@ from framework.logger import get_logger
 from framework import app, db, scheduler, path_data, socketio
 from framework.util import Util
 from system.logic import SystemLogic
-from framework.common.torrent.process import TorrentProcess
 
 # 패키지
 # 로그
