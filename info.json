@@ -1,1 +1,10 @@
-{"description": "\ub124\uc774\ubc84 \uc6f9\ud230 \ub2e4\uc6b4\ub85c\ub4dc", "name": "webtoon_naver", "more": "", "version": "0.1.0.0", "home": "https://github.com/soju6jan/webtoon_naver", "category_name": "service", "developer": "soju6jan"}
+{
+    "version": "0.1.0.0",
+    "name": "webtoon_naver",
+    "category_name": "service",
+    "developer": "soju6jan",
+    "description": "네이버 웹툰 다운로드",
+    "home": "https://github.com/soju6jan/webtoon_naver",
+    "more": "",
+    "category": "service"
+}
