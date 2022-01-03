@@ -13,8 +13,7 @@ from sqlalchemy import desc
 from sqlalchemy import or_, and_, func, not_
 import requests
 from lxml import html
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import TimeoutException
+
 
 # sjva 공용
 from framework import app, db, scheduler, path_app_root, celery
@@ -240,6 +239,7 @@ class LogicNormal(object):
     @staticmethod
     @celery.task(bind=True)
     def download2(self, entity):
+        from selenium.webdriver.support.ui import WebDriverWait
         try:
             from system import SystemLogicSelenium
             from . import plugin
