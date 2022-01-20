@@ -116,8 +116,8 @@ class LogicNormal(object):
                 base_div = '//*[@id="content"]/div[2]'
 
             ret['image'] = tree.xpath('%s/div[1]/a/img' % base_div)[0].attrib['src']
-            ret['title'] = tree.xpath('%s/div[2]/h2/text()' % base_div)[0].strip()
-            ret['author'] = tree.xpath('%s/div[2]/h2/span' % base_div)[0].text_content().strip()
+            ret['title'] = tree.xpath('%s/div[2]/h2/span[1]' % base_div)[0].text_content().strip()
+            ret['author'] = tree.xpath('%s/div[2]/h2/span[2]' % base_div)[0].text_content().strip()
             ret['desc'] = tree.xpath('%s/div[2]/p' % base_div)[0].text_content().strip()
             # 날짜 없을수도
             try:
@@ -342,8 +342,7 @@ class LogicNormal(object):
             entity['str_status'] = '대기'
             LogicNormal.entity_update(entity)
 
-            entity['title'] = tree.xpath('//*[@id="content"]/div[1]/div[1]/div[2]/h2/text()')[0].strip()
-            logger.debug(entity['title'])
+            entity['title'] = tree.xpath('//*[@id="content"]/div[1]/div[1]/div[2]/h2/span[1]/text()')[0].strip()
             tag = tree.xpath('//*[@id="content"]/div[1]/div[2]/div[1]/h3')[0]
             entity['episode_title'] = tag.text_content().strip()
             logger.debug(entity['episode_title'])
